@@ -1,0 +1,94 @@
+<div class="card">
+    <header class="header">
+        <div tuiAvatar="@tui.mail" size="l" appearance="info"></div>
+
+        <div class="info">
+            <div class="title"> Каналы уведомлений </div>
+
+            <div class="description">
+                Выберите, куда Astusha ID может отправлять уведомления.
+            </div>
+        </div>
+    </header>
+
+    <form [formGroup]="channelsForm">
+        <main class="content">
+            <div class="list">
+                <div class="item">
+                    <div class="item-icon">
+                        <tui-icon icon="@tui.mail" />
+                    </div>
+
+                    <div class="item-info">
+                        <div class="item-title"> Email-уведомления </div>
+
+                        <div class="item-meta">
+                            Важные события аккаунта будут приходить на почту.
+                        </div>
+                    </div>
+
+                    <input
+                        data-testid="email-notifications"
+                        tuiSwitch
+                        type="checkbox"
+                        formControlName="emailNotifications"
+                        [tuiSkeleton]="isLoading()"
+                        (change)="updateNotificationSettings()"
+                    />
+                </div>
+
+                <div class="item">
+                    <div class="item-icon">
+                        <tui-icon icon="@tui.bell" />
+                    </div>
+
+                    <div class="item-info">
+                        <div class="item-title">
+                            Push-уведомления
+
+                            <div tuiBadge appearance="neutral"> Скоро </div>
+                        </div>
+
+                        <div class="item-meta">
+                            Уведомления в браузере о важных действиях.
+                        </div>
+                    </div>
+
+                    <input
+                        data-testid="push-notifications"
+                        tuiSwitch
+                        type="checkbox"
+                        formControlName="pushNotifications"
+                        [tuiSkeleton]="isLoading()"
+                    />
+                </div>
+
+                <div class="item">
+                    <div class="item-icon">
+                        <tui-icon icon="@tui.send" />
+                    </div>
+
+                    <div class="item-info">
+                        <div class="item-title">
+                            Telegram
+
+                            <div tuiBadge appearance="neutral"> Скоро </div>
+                        </div>
+
+                        <div class="item-meta">
+                            Уведомления через Telegram-бота Astusha.
+                        </div>
+                    </div>
+
+                    <input
+                        data-testid="telegram-notifications"
+                        tuiSwitch
+                        type="checkbox"
+                        formControlName="telegramNotifications"
+                        [tuiSkeleton]="isLoading()"
+                    />
+                </div>
+            </div>
+        </main>
+    </form>
+</div>

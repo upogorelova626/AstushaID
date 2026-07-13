@@ -1,0 +1,31 @@
+:host {
+    display: block;
+}
+
+.settings-page {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    margin-right: 10px;
+    margin-bottom: 10px;
+
+    &__bottom {
+        display: flex;
+        gap: 10px;
+        align-items: stretch;
+    }
+
+    &__bottom > * {
+        flex: 1 1 0;
+        min-width: 0;
+    }
+}
+
+@media (max-width: 1055px) {
+    .settings-page {
+        margin-right: 0px;
+        &__bottom {
+            flex-direction: column;
+        }
+    }
+}

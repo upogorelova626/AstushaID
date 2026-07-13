@@ -1,0 +1,35 @@
+<div class="card">
+    <header class="header">
+        <div class="appearance-settings-card__icon-wrapper">
+            <div tuiAvatar="@tui.monitor" size="l" appearance="info"></div>
+        </div>
+
+        <div class="header-content">
+            <div class="title">Внешний вид</div>
+
+            <div class="description">
+                Выберите тему для оформления интерфейса.
+            </div>
+        </div>
+    </header>
+
+    <div class="buttons">
+        @for (theme of themes; track theme.theme) {
+            <button
+                tuiButton
+                type="button"
+                [iconStart]="theme.icon"
+                appearance="outline"
+                size="l"
+                class="button"
+                [class.appearance-settings-card__button_active]="
+                    selectedTheme() === theme.theme
+                "
+                [disabled]="!!changingTheme()"
+                (click)="changeTheme(theme.theme)"
+            >
+                {{ theme.label }}
+            </button>
+        }
+    </div>
+</div>

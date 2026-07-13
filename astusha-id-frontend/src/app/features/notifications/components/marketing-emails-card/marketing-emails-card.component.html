@@ -1,0 +1,50 @@
+<section class="card">
+    <header class="header">
+        <div
+            class="header-icon"
+            tuiAvatar="@tui.mail"
+            size="l"
+            appearance="info"
+        ></div>
+
+        <div class="header-info">
+            <div class="title">Маркетинговые рассылки</div>
+
+            <div class="description">
+                Настройте, хотите ли вы получать письма о новостях Astusha,
+                обновлениях продукта и полезных материалах.
+            </div>
+        </div>
+    </header>
+
+    <main class="content">
+        <label class="setting">
+            <div class="setting-info">
+                <div class="setting-title"> Получать маркетинговые письма </div>
+
+                <div class="setting-description">
+                    Новости продукта, анонсы новых функций, полезные материалы и
+                    специальные предложения.
+                </div>
+            </div>
+
+            <input
+                data-testid="marketing-notifications"
+                class="switch"
+                tuiSwitch
+                type="checkbox"
+                [tuiSkeleton]="isLoading()"
+                [formControl]="control"
+                (change)="updateNotificationSettings()"
+            />
+        </label>
+    </main>
+
+    <footer class="footer">
+        <tui-icon class="footer-icon" icon="@tui.info" />
+
+        <div class="footer-text">
+            Эту настройку можно изменить в любой момент.
+        </div>
+    </footer>
+</section>

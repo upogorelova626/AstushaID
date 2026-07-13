@@ -1,0 +1,151 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum UserTheme {
+  LIGHT
+  DARK
+  SYSTEM
+}
+
+enum UserActivityAction {
+  LOGIN
+  PASSWORD_CHANGED
+  SESSION_TERMINATED
+  ALL_SESSIONS_TERMINATED
+  TWO_FACTOR_ENABLED
+  TWO_FACTOR_DISABLED
+  ACCOUNT_DELETED
+}
+
+model User {
+  id           String @id @default(uuid())
+  login        String @unique
+  email        String @unique
+  passwordHash String
+
+  firstName String?
+  lastName  String?
+  avatarUrl String?
+  avatarKey String?
+  position  String?
+  about     String?
+
+  emailVerifiedAt DateTime?
+
+  theme UserTheme @default(LIGHT)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  emailTwoFactorEnabled Boolean @default(false)
+
+  sessions                 Session[]
+  passwordResetTokens      PasswordResetToken[]
+  activities               UserActivity[]
+  emailTwoFactorChallenges EmailTwoFactorChallenge[]
+  notificationSettings     UserNotificationSettings?
+
+  @@map("users")
+}
+
+model UserNotificationSettings {
+  id     String @id @default(uuid())
+  userId String @unique
+
+  emailNotificationsEnabled    Boolean @default(true)
+  pushNotificationsEnabled     Boolean @default(false)
+  telegramNotificationsEnabled Boolean @default(false)
+
+  loginNotificationsEnabled             Boolean @default(true)
+  passwordChangedNotificationsEnabled   Boolean @default(true)
+  sessionsFinishedNotificationsEnabled  Boolean @default(true)
+  twoFactorNotificationsEnabled         Boolean @default(true)
+  marketingEmailsEnabled                Boolean @default(false)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@map("user_notification_settings")
+}
+
+model EmailTwoFactorChallenge {
+  id        String    @id @default(uuid())
+  userId    String
+  codeHash  String
+  userAgent String?
+  ipAddress String?
+  expiresAt DateTime
+  usedAt    DateTime?
+  attempts  Int       @default(0)
+  createdAt DateTime  @default(now())
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@index([expiresAt])
+  @@map("email_two_factor_challenges")
+}
+
+model Session {
+  id               String    @id @default(uuid())
+  userId           String
+  refreshTokenHash String    @unique
+  userAgent        String?
+  ipAddress        String?
+  expiresAt        DateTime
+  revokedAt        DateTime?
+  lastActiveAt     DateTime  @default(now())
+  createdAt        DateTime  @default(now())
+  updatedAt        DateTime  @updatedAt
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@index([revokedAt])
+  @@index([expiresAt])
+  @@index([userId, revokedAt])
+  @@map("sessions")
+}
+
+model PasswordResetToken {
+  id        String    @id @default(uuid())
+  userId    String
+  tokenHash String    @unique
+  expiresAt DateTime
+  usedAt    DateTime?
+  createdAt DateTime  @default(now())
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@map("password_reset_tokens")
+}
+
+model UserActivity {
+  id String @id @default(uuid())
+
+  userId String
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  action UserActivityAction
+
+  userAgent String?
+  ipAddress String?
+  location  String?
+
+  createdAt DateTime @default(now())
+
+  @@index([userId])
+  @@index([createdAt])
+  @@index([userId, createdAt])
+  @@map("user_activities")
+}

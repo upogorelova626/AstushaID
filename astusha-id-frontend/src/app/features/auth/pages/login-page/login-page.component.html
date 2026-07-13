@@ -1,0 +1,96 @@
+<div class="wrapper">
+    <header class="header">
+        <h1 class="header-title">Вход в аккаунт</h1>
+
+        <p class="header-subtitle">
+            Продолжайте работать с сервисами AstushaApp
+        </p>
+    </header>
+
+    <main class="content">
+        <form class="form" [formGroup]="loginForm" (ngSubmit)="login()">
+            <tui-textfield iconStart="@tui.mail">
+                <label tuiLabel for="emailOrLogin"> Email или логин </label>
+
+                <input
+                    id="emailOrLogin"
+                    tuiInput
+                    type="text"
+                    placeholder="Введите email или логин"
+                    formControlName="loginOrEmail"
+                />
+            </tui-textfield>
+            <tui-error
+                formControlName="loginOrEmail"
+                [order]="['required', 'maxlength']"
+            />
+
+            <tui-textfield iconStart="@tui.lock-keyhole">
+                <label tuiLabel for="password"> Пароль </label>
+
+                <input
+                    id="password"
+                    tuiInput
+                    type="password"
+                    placeholder="Введите пароль"
+                    formControlName="password"
+                />
+                <tui-icon tuiPassword />
+            </tui-textfield>
+            <tui-error formControlName="password" [order]="['required']" />
+
+            <div class="options">
+                <label class="remember">
+                    <input tuiCheckbox type="checkbox" size="m" />
+
+                    <span class="remember-text"> Запомнить меня </span>
+                </label>
+
+                <a
+                    tuiLink
+                    class="forgot-password"
+                    routerLink="/auth/forgot-password"
+                >
+                    Забыли пароль?
+                </a>
+            </div>
+
+            <button tuiButton class="submit" type="submit" size="l">
+                Войти
+            </button>
+        </form>
+    </main>
+
+    <footer class="footer">
+        <div class="divider">
+            <span class="divider-line"></span>
+
+            <p class="divider-text">или</p>
+
+            <span class="divider-line"></span>
+        </div>
+
+        <button
+            tuiButton
+            class="google-button"
+            type="button"
+            appearance="outline"
+            size="l"
+            disabled
+        >
+            Войти через Google
+        </button>
+
+        <div class="create-account">
+            <span class="create-account-text"> Нет аккаунта? </span>
+
+            <a
+                tuiLink
+                class="create-account-link"
+                [routerLink]="['/auth', 'create-account']"
+            >
+                Создать аккаунт
+            </a>
+        </div>
+    </footer>
+</div>

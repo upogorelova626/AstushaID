@@ -1,0 +1,116 @@
+<div class="card">
+    <header class="header">
+        <div tuiAvatar="@tui.shield" size="l" appearance="positive"></div>
+
+        <div class="info">
+            <div class="title"> Безопасность аккаунта </div>
+
+            <div class="description">
+                Настройте уведомления о важных действиях с вашим аккаунтом.
+            </div>
+        </div>
+    </header>
+
+    <main class="content">
+        <form [formGroup]="securityNotificationsForm">
+            <div class="list">
+                <div class="item">
+                    <div class="item-icon">
+                        <tui-icon icon="@tui.log-in" />
+                    </div>
+
+                    <div class="item-info">
+                        <div class="item-title"> Новый вход в аккаунт </div>
+
+                        <div class="item-meta">
+                            Уведомлять, если кто-то вошёл в аккаунт с нового
+                            устройства.
+                        </div>
+                    </div>
+
+                    <input
+                        data-testid="login-notifications"
+                        tuiSwitch
+                        type="checkbox"
+                        formControlName="login"
+                        [tuiSkeleton]="isLoading()"
+                        (change)="updateNotificationSettings()"
+                    />
+                </div>
+
+                <div class="item">
+                    <div class="item-icon">
+                        <tui-icon icon="@tui.lock-keyhole" />
+                    </div>
+
+                    <div class="item-info">
+                        <div class="item-title"> Смена пароля </div>
+
+                        <div
+                            class="account-security-notifications-card__item-meta"
+                        >
+                            Отправлять уведомление после изменения пароля.
+                        </div>
+                    </div>
+
+                    <input
+                        data-testid="change-password-notifications"
+                        tuiSwitch
+                        type="checkbox"
+                        formControlName="changePassword"
+                        [tuiSkeleton]="isLoading()"
+                        (change)="updateNotificationSettings()"
+                    />
+                </div>
+
+                <div class="item">
+                    <div class="item-icon">
+                        <tui-icon icon="@tui.monitor-x" />
+                    </div>
+
+                    <div class="item-info">
+                        <div class="item-title"> Завершение сессий </div>
+
+                        <div class="item-meta">
+                            Уведомлять о выходе с других устройств.
+                        </div>
+                    </div>
+
+                    <input
+                        data-testid="sessions-finished-notifications"
+                        tuiSwitch
+                        type="checkbox"
+                        formControlName="sessionsFinished"
+                        [tuiSkeleton]="isLoading()"
+                        (change)="updateNotificationSettings()"
+                    />
+                </div>
+
+                <div class="item">
+                    <div class="item-icon">
+                        <tui-icon icon="@tui.badge-check" />
+                    </div>
+
+                    <div class="item-info">
+                        <div class="item-title">
+                            Двухфакторная аутентификация
+                        </div>
+
+                        <div class="item-meta">
+                            Уведомлять о включении и отключении 2FA.
+                        </div>
+                    </div>
+
+                    <input
+                        data-testid="two-factor-notifications"
+                        tuiSwitch
+                        type="checkbox"
+                        formControlName="twoFactorNotifications"
+                        [tuiSkeleton]="isLoading()"
+                        (change)="updateNotificationSettings()"
+                    />
+                </div>
+            </div>
+        </form>
+    </main>
+</div>

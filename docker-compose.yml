@@ -1,0 +1,43 @@
+services:
+    postgres:
+        image: postgres:17-alpine
+        container_name: astusha-id-postgres
+        restart: unless-stopped
+        environment:
+            POSTGRES_DB: ${POSTGRES_DB}
+            POSTGRES_USER: ${POSTGRES_USER}
+            POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+        ports:
+            - '${POSTGRES_PORT}:5432'
+        volumes:
+            - postgres_data:/var/lib/postgresql/data
+
+    backend:
+        build:
+            context: ./astusha-id-backend
+            dockerfile: Dockerfile
+        container_name: astusha-id-backend
+        restart: unless-stopped
+        depends_on:
+            - postgres
+        env_file:
+            - ./astusha-id-backend/.env
+        environment:
+            PORT: 3002
+            DATABASE_URL: postgresql://${POSTGRES_USER}:${POSTGRES_PASSWORD}@postgres:5432/${POSTGRES_DB}
+        ports:
+            - '3002:3002'
+
+    frontend:
+        build:
+            context: ./astusha-id-frontend
+            dockerfile: Dockerfile
+        container_name: astusha-id-frontend
+        restart: unless-stopped
+        depends_on:
+            - backend
+        ports:
+            - '4202:80'
+
+volumes:
+    postgres_data:

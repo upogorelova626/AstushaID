@@ -1,0 +1,55 @@
+<div class="card">
+    <header class="header">
+        <div tuiAvatar="@tui.clock" size="l" appearance="info"></div>
+
+        <div class="info">
+            <h2 class="title">Недавняя активность</h2>
+
+            <p class="description">
+                Просматривайте историю входов в ваш аккаунт.
+            </p>
+        </div>
+    </header>
+
+    <main class="content">
+        <table tuiTable [tuiSkeleton]="isLoading()">
+            <thead>
+                <tr>
+                    <th tuiTh>Время</th>
+                    <th tuiTh>Устройство</th>
+                    <th tuiTh>Действие</th>
+                    <th tuiTh>Местоположение</th>
+                    <th tuiTh>IP-адрес</th>
+                </tr>
+            </thead>
+
+            <tbody tuiTbody>
+                @for (action of previewActions(); track action.id) {
+                    <tr>
+                        <td tuiTd>
+                            {{ action.time | date: 'd MMM y, HH:mm' }}
+                        </td>
+
+                        <td tuiTd>{{ action.device }}</td>
+                        <td tuiTd>{{ action.actionLabel }}</td>
+                        <td tuiTd>{{ action.location }}</td>
+                        <td tuiTd>{{ action.ipAddress }}</td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </main>
+
+    @if (userActivities().length > 3) {
+        <button
+            class="button"
+            tuiButton
+            type="button"
+            appearance="flat"
+            size="s"
+            (click)="showAllActions()"
+        >
+            Показать больше
+        </button>
+    }
+</div>

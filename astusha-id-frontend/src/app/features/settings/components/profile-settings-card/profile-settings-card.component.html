@@ -1,0 +1,212 @@
+<section class="card">
+    <header class="header">
+        <div tuiAvatar="@tui.user" appearance="info" size="l"> </div>
+
+        <div class="header-content">
+            <div class="title">Профиль</div>
+
+            <div class="description">
+                Эти данные будут отображаться в вашем профиле и других сервисах
+                Astusha.
+            </div>
+        </div>
+
+        <button
+            class="edit-button"
+            tuiButton
+            type="button"
+            iconStart="@tui.pencil"
+            appearance="flat"
+            [disabled]="isEditing()"
+            (click)="startEditing()"
+        >
+            Редактировать
+        </button>
+    </header>
+
+    <main class="content">
+        <div class="avatar">
+            @if (avatarPreviewUrl() || currentUser()?.avatarUrl) {
+                <div class="avatar-preview">
+                    <img
+                        class="avatar-image"
+                        [src]="avatarPreviewUrl() || currentUser()?.avatarUrl"
+                        alt="Фото профиля"
+                    />
+                </div>
+            } @else {
+                <div
+                    class="avatar-preview"
+                    tuiAvatar="@tui.user"
+                    size="xxl"
+                ></div>
+            }
+
+            <div class="avatar-content">
+                @if (isEditing()) {
+                    <div class="avatar-title">Фото профиля</div>
+
+                    <p class="avatar-description">
+                        JPG, PNG или WEBP до 5 МБ.
+                    </p>
+
+                    @if (!avatarControl.value) {
+                        <label tuiInputFiles class="avatar-upload">
+                            <input
+                                tuiInputFiles
+                                type="file"
+                                accept="image/png,image/jpeg,image/webp"
+                                [formControl]="avatarControl"
+                            />
+                        </label>
+                    }
+
+                    <tui-files class="files">
+                        @if (
+                            avatarControl.value
+                                | tuiFileRejected
+                                    : {
+                                          accept: 'image/png,image/jpeg,image/webp'
+                                      }
+                                | async;
+                            as file
+                        ) {
+                            <tui-file
+                                state="error"
+                                [file]="file"
+                                (remove)="removeAvatarFile()"
+                            />
+                        }
+
+                        @if (loadingAvatarFiles$ | async; as file) {
+                            <tui-file
+                                size="l"
+                                [file]="file"
+                                (remove)="removeAvatarFile()"
+                            />
+                        }
+
+                        @if (failedAvatarFiles$ | async; as file) {
+                            <tui-file
+                                state="error"
+                                [file]="file"
+                                (remove)="removeAvatarFile()"
+                            />
+                        }
+
+                        @if (loadingAvatarFiles$ | async; as file) {
+                            <tui-file
+                                state="loading"
+                                [file]="file"
+                                (remove)="removeAvatarFile()"
+                            />
+                        }
+                    </tui-files>
+
+                    @if (currentUser()?.avatarUrl) {
+                        <button
+                            class="avatar-delete"
+                            tuiButton
+                            type="button"
+                            size="s"
+                            appearance="outline-destructive"
+                            iconStart="@tui.trash"
+                            (click)="deleteAvatar()"
+                        >
+                            Удалить фото
+                        </button>
+                    }
+                }
+            </div>
+        </div>
+
+        <form class="form" [formGroup]="form">
+            <div class="row">
+                <tui-textfield>
+                    <label tuiLabel for="firstName">Имя</label>
+
+                    <input
+                        id="firstName"
+                        tuiInput
+                        placeholder="Введите имя"
+                        formControlName="firstName"
+                        [readOnly]="!isEditing()"
+                    />
+                </tui-textfield>
+
+                <tui-textfield>
+                    <label tuiLabel for="lastName">Фамилия</label>
+
+                    <input
+                        id="lastName"
+                        tuiInput
+                        placeholder="Введите фамилию"
+                        formControlName="lastName"
+                        [readOnly]="!isEditing()"
+                    />
+                </tui-textfield>
+            </div>
+
+            <div class="row">
+                <tui-textfield>
+                    <label tuiLabel for="email">Email</label>
+
+                    <input
+                        id="email"
+                        autocomplete="email"
+                        tuiInput
+                        placeholder="Введите email"
+                        [value]="currentUser()?.email"
+                        disabled
+                    />
+                </tui-textfield>
+
+                <tui-textfield>
+                    <label tuiLabel for="position">Должность</label>
+
+                    <input
+                        id="position"
+                        tuiInput
+                        placeholder="Введите должность"
+                        formControlName="position"
+                        [readOnly]="!isEditing()"
+                    />
+                </tui-textfield>
+            </div>
+
+            <tui-textfield>
+                <label tuiLabel for="about">О себе</label>
+
+                <input
+                    id="about"
+                    tuiInput
+                    placeholder="Расскажите немного о себе"
+                    formControlName="about"
+                    [readOnly]="!isEditing()"
+                />
+            </tui-textfield>
+        </form>
+    </main>
+
+    <footer class="footer">
+        <button
+            tuiButton
+            type="button"
+            iconStart="@tui.check"
+            [disabled]="!isEditing() || isSaving() || form.invalid"
+            (click)="saveEdits()"
+        >
+            Сохранить изменения
+        </button>
+
+        <button
+            tuiButton
+            type="button"
+            appearance="flat"
+            [disabled]="!isEditing() || isSaving()"
+            (click)="cancelEditing()"
+        >
+            Отменить
+        </button>
+    </footer>
+</section>

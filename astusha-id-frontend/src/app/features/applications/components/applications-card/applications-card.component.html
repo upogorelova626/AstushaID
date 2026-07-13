@@ -1,0 +1,52 @@
+<div class="card">
+    <header class="header">
+        <div>
+            <div class="title"> Приложения Astusha </div>
+
+            <div class="description">
+                Управляйте сервисами экосистемы Astusha, подключёнными к вашему
+                аккаунту.
+            </div>
+        </div>
+
+        <span class="counter"> {{ applications.length }} сервисов </span>
+    </header>
+
+    <div class="list">
+        @for (application of applications; track application.name) {
+            <article class="item">
+                <div class="icon-wrapper">
+                    <tui-icon class="card__icon" [icon]="application.icon" />
+                </div>
+
+                <div class="info">
+                    <div class="name">
+                        {{ application.name }}
+                    </div>
+
+                    <p class="text">
+                        {{ application.description }}
+                    </p>
+                </div>
+
+                <div
+                    class="label"
+                    tuiBadge
+                    [appearance]="application.appearance"
+                >
+                    {{ application.statusLabel }}
+                </div>
+
+                <button
+                    tuiButton
+                    type="button"
+                    appearance="flat"
+                    iconStart="@tui.chevron-right"
+                    class="action"
+                    [disabled]="application.disabled"
+                    (click)="openApplication(application)"
+                ></button>
+            </article>
+        }
+    </div>
+</div>

@@ -1,0 +1,139 @@
+<div class="wrapper">
+    <header class="header">
+        <h1 class="header-title">Создайте аккаунт</h1>
+
+        <p class="header-subtitle">
+            Зарегистрируйтесь, чтобы использовать все сервисы Astusha
+        </p>
+    </header>
+
+    <main class="content">
+        <form
+            class="form"
+            [formGroup]="createAccountForm"
+            (submit)="createAccount()"
+        >
+            <tui-textfield iconStart="@tui.user">
+                <label tuiLabel for="login">Логин</label>
+
+                <input
+                    id="login"
+                    tuiInput
+                    type="text"
+                    autocomplete="username"
+                    placeholder="Введите логин"
+                    formControlName="login"
+                />
+            </tui-textfield>
+            <tui-error
+                formControlName="login"
+                [order]="['required', 'minlength', 'maxlength']"
+            />
+
+            <tui-textfield iconStart="@tui.mail">
+                <label tuiLabel for="email"> Email </label>
+
+                <input
+                    id="email"
+                    tuiInput
+                    type="email"
+                    autocomplete="email"
+                    placeholder="Введите email"
+                    formControlName="email"
+                />
+            </tui-textfield>
+            <tui-error
+                formControlName="email"
+                [order]="['required', 'email', 'maxlength']"
+            />
+
+            <tui-textfield iconStart="@tui.lock-keyhole">
+                <label tuiLabel for="password"> Пароль </label>
+
+                <input
+                    id="password"
+                    tuiInput
+                    type="password"
+                    placeholder="Введите пароль"
+                    formControlName="password"
+                />
+
+                <tui-icon tuiPassword />
+            </tui-textfield>
+            <tui-error
+                formControlName="password"
+                [order]="['required', 'minlength', 'maxlength']"
+            />
+
+            <tui-textfield iconStart="@tui.lock-keyhole">
+                <label tuiLabel for="password"> Подтвердите пароль </label>
+
+                <input
+                    id="password"
+                    tuiInput
+                    type="password"
+                    placeholder="Повторите пароль"
+                    formControlName="confirmPassword"
+                />
+
+                <tui-icon tuiPassword />
+            </tui-textfield>
+            <tui-error
+                formControlName="confirmPassword"
+                [order]="[
+                    'passwordMismatch',
+                    'required',
+                    'minlength',
+                    'maxlength'
+                ]"
+            />
+
+            <label class="agreement">
+                <input
+                    tuiCheckbox
+                    type="checkbox"
+                    size="m"
+                    formControlName="agreement"
+                />
+
+                <span class="agreement-text">
+                    Я принимаю условия использования и политику
+                    конфиденциальности
+                </span>
+            </label>
+
+            <button tuiButton class="submit-button" type="submit" size="l">
+                Создать аккаунт
+            </button>
+        </form>
+    </main>
+
+    <footer class="footer">
+        <div class="divider">
+            <span class="divider-line"></span>
+
+            <p class="divider-text">или</p>
+
+            <span class="divider-line"></span>
+        </div>
+
+        <button
+            tuiButton
+            class="google-button"
+            type="button"
+            appearance="outline"
+            size="l"
+            disabled
+        >
+            Создать аккаунт через Google
+        </button>
+
+        <div class="login">
+            <span class="login-text"> Уже есть аккаунт? </span>
+
+            <a tuiLink class="login-link" [routerLink]="['/auth', 'login']">
+                Войти
+            </a>
+        </div>
+    </footer>
+</div>

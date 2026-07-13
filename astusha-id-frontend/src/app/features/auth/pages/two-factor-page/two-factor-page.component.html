@@ -1,0 +1,82 @@
+<div class="wrapper">
+    <header class="header">
+        <div class="icon" tuiAvatar="@tui.mail" appearance="info"></div>
+
+        <h1 class="header-title">Подтверждение входа</h1>
+
+        <p class="header-subtitle">
+            Мы отправили код подтверждения
+            @if (email()) {
+                на {{ email() }}.
+            } @else {
+                на вашу почту.
+            }
+            Введите его ниже, чтобы завершить вход в аккаунт.
+        </p>
+    </header>
+
+    <main class="content">
+        <form class="form" (submit)="$event.preventDefault()">
+            <label for="two-factor-code">Код из письма</label>
+
+            <tui-textfield class="pin">
+                <input
+                    id="two-factor-code"
+                    tuiInputPin
+                    inputmode="numeric"
+                    maxlength="6"
+                    autocomplete="one-time-code"
+                    placeholder="••••••"
+                    [formControl]="code"
+                    (keydown.enter)="verifyCode()"
+                />
+            </tui-textfield>
+
+            @if (code.touched && code.invalid) {
+                <p class="error">Введите 6 цифр из письма</p>
+            } @else {
+                <p class="hint">Код действует 10 минут</p>
+            }
+
+            <button
+                tuiButton
+                class="submit"
+                type="button"
+                size="l"
+                [disabled]="isLoading()"
+                [loading]="isLoading()"
+                (click)="verifyCode()"
+            >
+                Подтвердить
+            </button>
+        </form>
+
+        <div class="resend">
+            <div>
+                <p class="resend-title">Не получили письмо?</p>
+
+                <p class="resend-text">
+                    Проверьте папку «Спам» или вернитесь ко входу, чтобы
+                    запросить новый код.
+                </p>
+            </div>
+
+            <button tuiButton type="button" appearance="flat" size="s" disabled>
+                Отправить повторно
+            </button>
+        </div>
+
+        <footer class="footer">
+            <a
+                tuiLink
+                class="login-link"
+                role="button"
+                tabindex="0"
+                (click)="backToLogin()"
+                (keydown.enter)="backToLogin()"
+            >
+                Вернуться ко входу
+            </a>
+        </footer>
+    </main>
+</div>

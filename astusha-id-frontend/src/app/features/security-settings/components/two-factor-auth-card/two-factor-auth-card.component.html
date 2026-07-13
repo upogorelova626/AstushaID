@@ -1,0 +1,49 @@
+<div class="card">
+    <header class="header">
+        <div tuiAvatar="@tui.shield-check" size="l" appearance="warning"></div>
+
+        <div class="info">
+            <div class="title">Двухфакторная аутентификация</div>
+
+            <div class="description">
+                Добавьте дополнительный уровень защиты для вашего аккаунта.
+            </div>
+        </div>
+    </header>
+
+    <main class="content">
+        <div class="status">
+            <div
+                tuiAvatar="@tui.lock-keyhole"
+                size="m"
+                appearance="positive"
+            ></div>
+
+            <div class="status-info">
+                @if (me()?.emailTwoFactorEnabled) {
+                    <div class="status-title status-title_enabled">
+                        2FA включена
+                    </div>
+
+                    <div class="status-description">
+                        Ваш аккаунт защищён дополнительным уровнем безопасности.
+                    </div>
+                } @else {
+                    <div class="status-title">2FA выключена</div>
+
+                    <div class="status-description">
+                        Включите 2FA, чтобы дополнительно защитить аккаунт.
+                    </div>
+                }
+            </div>
+
+            <input
+                class="switch"
+                tuiSwitch
+                type="checkbox"
+                [formControl]="control"
+                (change)="toggleTwoFactor()"
+            />
+        </div>
+    </main>
+</div>
