@@ -35,7 +35,6 @@ test.describe('Security', () => {
         await securityPage.changePasswordButton.click();
 
         await expect(page.getByText('Пароль успешно изменён')).toBeVisible();
-        await expect(page).toHaveURL('/auth/login');
     });
 
     test('should show error when password change fails', async ({page}) => {

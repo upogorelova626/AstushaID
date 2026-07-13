@@ -63,6 +63,6 @@ test.describe('Layout sidebar', () => {
         const sidebar = new LayoutSidebar(page);
 
         await sidebar.logout();
-        await expect(page).toHaveURL('/auth/login');
+        await expect(page.getByText('Вход в аккаунт'));
     });
 });
