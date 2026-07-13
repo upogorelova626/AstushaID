@@ -15,7 +15,7 @@ import {BehaviorSubject, Observable, tap} from 'rxjs';
 export class UsersService {
     private readonly http = inject(HttpClient);
 
-    private readonly baseApiUrl = 'http://localhost:3002/users';
+    private readonly baseApiUrl = '/api/users';
 
     private readonly currentUserSubject =
         new BehaviorSubject<AstushaUser | null>(null);
