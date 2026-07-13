@@ -1,5 +1,9 @@
 name: CI
 
+permissions:
+  contents: read
+  packages: write
+
 on:
   push:
     branches:
@@ -130,3 +134,61 @@ jobs:
 
       - name: Build backend image
         run: docker build -t astusha-id-backend:test ./astusha-id-backend
+
+      publish-frontend:
+    name: Publish frontend image
+    runs-on: ubuntu-latest
+    needs:
+      - frontend-docker
+      - backend-docker
+      - e2e
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Login to GitHub Container Registry
+        uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Build and push frontend image
+        uses: docker/build-push-action@v6
+        with:
+          context: ./astusha-id-frontend
+          push: true
+          tags: |
+            ghcr.io/${{ github.repository_owner }}/astusha-id-frontend:latest
+            ghcr.io/${{ github.repository_owner }}/astusha-id-frontend:${{ github.sha }}
+
+  publish-backend:
+    name: Publish backend image
+    runs-on: ubuntu-latest
+    needs:
+      - frontend-docker
+      - backend-docker
+      - e2e
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Login to GitHub Container Registry
+        uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Build and push backend image
+        uses: docker/build-push-action@v6
+        with:
+          context: ./astusha-id-backend
+          push: true
+          tags: |
+            ghcr.io/${{ github.repository_owner }}/astusha-id-backend:latest
+            ghcr.io/${{ github.repository_owner }}/astusha-id-backend:${{ github.sha }}
