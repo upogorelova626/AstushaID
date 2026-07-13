@@ -1,0 +1,47 @@
+services:
+    postgres:
+        image: postgres:17-alpine
+        container_name: astusha-id-postgres
+        restart: unless-stopped
+        environment:
+            POSTGRES_DB: ${POSTGRES_DB}
+            POSTGRES_USER: ${POSTGRES_USER}
+            POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+        ports:
+            - '127.0.0.1:5432:5432'
+        volumes:
+            - postgres_data:/var/lib/postgresql/data
+        healthcheck:
+            test:
+                - CMD-SHELL
+                - pg_isready -U ${POSTGRES_USER} -d ${POSTGRES_DB}
+            interval: 10s
+            timeout: 5s
+            retries: 5
+
+    backend:
+        image: ghcr.io/upogorelova626/astusha-id-backend:latest
+        container_name: astusha-id-backend
+        restart: unless-stopped
+        depends_on:
+            postgres:
+                condition: service_healthy
+        env_file:
+            - .env
+        environment:
+            PORT: 3002
+            DATABASE_URL: postgresql://${POSTGRES_USER}:${POSTGRES_PASSWORD}@postgres:5432/${POSTGRES_DB}
+        expose:
+            - '3002'
+
+    frontend:
+        image: ghcr.io/upogorelova626/astusha-id-frontend:latest
+        container_name: astusha-id-frontend
+        restart: unless-stopped
+        depends_on:
+            - backend
+        ports:
+            - '80:80'
+
+volumes:
+    postgres_data:

@@ -6,7 +6,7 @@ import {
     inject,
     signal
 } from '@angular/core';
-import {toSignal} from '@angular/core/rxjs-interop';
+import {takeUntilDestroyed, toSignal} from '@angular/core/rxjs-interop';
 import {
     FormControl,
     FormGroup,
@@ -31,7 +31,6 @@ import {
     switchMap,
     tap
 } from 'rxjs';
-
 import {AstushaUser} from '../../../../shared/interfaces';
 import {UsersService} from '../../../auth/services/users.service';
 
@@ -62,6 +61,7 @@ export class ProfileSettingsCardComponent {
     protected readonly currentUser = toSignal(this.usersService.currentUser$, {
         initialValue: null
     });
+
     protected readonly isEditing = signal(false);
     protected readonly isSaving = signal(false);
     protected readonly isAvatarDeleting = signal(false);
@@ -94,12 +94,14 @@ export class ProfileSettingsCardComponent {
 
     protected readonly loadingAvatarFiles$ = new Subject<TuiFileLike | null>();
 
-    protected readonly loadedAvatarFiles$ =
-        this.avatarControl.valueChanges.pipe(
-            switchMap(file => this.processAvatarFile(file))
-        );
-
     constructor() {
+        this.avatarControl.valueChanges
+            .pipe(
+                switchMap(file => this.processAvatarFile(file)),
+                takeUntilDestroyed()
+            )
+            .subscribe();
+
         effect(() => {
             const user = this.currentUser();
 
@@ -141,16 +143,20 @@ export class ProfileSettingsCardComponent {
                     this.form.markAsUntouched();
                     this.isEditing.set(false);
 
-                    this.showSuccess(
-                        'Изменения профиля успешно сохранены',
-                        'Профиль обновлён'
-                    );
+                    this.alerts
+                        .open('Изменения профиля успешно сохранены', {
+                            label: 'Профиль обновлён',
+                            appearance: 'positive'
+                        })
+                        .subscribe();
                 }),
                 catchError(() => {
-                    this.showError(
-                        'Не удалось сохранить изменения профиля',
-                        'Ошибка'
-                    );
+                    this.alerts
+                        .open('Не удалось сохранить изменения профиля', {
+                            label: 'Ошибка',
+                            appearance: 'negative'
+                        })
+                        .subscribe();
 
                     return EMPTY;
                 }),
@@ -177,10 +183,20 @@ export class ProfileSettingsCardComponent {
                 tap(() => {
                     this.removeAvatarFile();
 
-                    this.showSuccess('Фото профиля удалено', 'Аватар обновлён');
+                    this.alerts
+                        .open('Фото профиля удалено', {
+                            label: 'Аватар обновлён',
+                            appearance: 'positive'
+                        })
+                        .subscribe();
                 }),
                 catchError(() => {
-                    this.showError('Не удалось удалить фото профиля', 'Ошибка');
+                    this.alerts
+                        .open('Не удалось удалить фото профиля', {
+                            label: 'Ошибка',
+                            appearance: 'negative'
+                        })
+                        .subscribe();
 
                     return EMPTY;
                 }),
@@ -220,17 +236,24 @@ export class ProfileSettingsCardComponent {
             tap(() => {
                 this.avatarPreviewUrl.set(null);
 
-                this.showSuccess(
-                    'Фото профиля успешно обновлено',
-                    'Аватар обновлён'
-                );
+                this.alerts
+                    .open('Фото профиля успешно обновлено', {
+                        label: 'Аватар обновлён',
+                        appearance: 'positive'
+                    })
+                    .subscribe();
             }),
             map(() => file),
             catchError(() => {
                 this.failedAvatarFiles$.next(file);
                 this.avatarPreviewUrl.set(null);
 
-                this.showError('Не удалось загрузить фото профиля', 'Ошибка');
+                this.alerts
+                    .open('Не удалось загрузить фото профиля', {
+                        label: 'Ошибка',
+                        appearance: 'negative'
+                    })
+                    .subscribe();
 
                 return of(null);
             }),
@@ -256,41 +279,27 @@ export class ProfileSettingsCardComponent {
 
     private isValidAvatar(file: File) {
         if (!ALLOWED_AVATAR_TYPES.has(file.type)) {
-            this.showError(
-                'Можно загрузить только JPEG, PNG или WEBP',
-                'Некорректный файл'
-            );
+            this.alerts
+                .open('Можно загрузить только JPEG, PNG или WEBP', {
+                    label: 'Некорректный файл',
+                    appearance: 'negative'
+                })
+                .subscribe();
 
             return false;
         }
 
         if (file.size > MAX_AVATAR_SIZE) {
-            this.showError(
-                'Размер файла не должен превышать 5 МБ',
-                'Файл слишком большой'
-            );
+            this.alerts
+                .open('Размер файла не должен превышать 5 МБ', {
+                    label: 'Файл слишком большой',
+                    appearance: 'negative'
+                })
+                .subscribe();
 
             return false;
         }
 
         return true;
-    }
-
-    private showSuccess(message: string, label: string) {
-        this.alerts
-            .open(message, {
-                label,
-                appearance: 'positive'
-            })
-            .subscribe();
-    }
-
-    private showError(message: string, label: string) {
-        this.alerts
-            .open(message, {
-                label,
-                appearance: 'negative'
-            })
-            .subscribe();
     }
 }

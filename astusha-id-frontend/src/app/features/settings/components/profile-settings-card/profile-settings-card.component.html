@@ -51,7 +51,7 @@
                     </p>
 
                     @if (!avatarControl.value) {
-                        <label tuiInputFiles class="avatar-upload">
+                        <label class="avatar-upload" tuiInputFiles>
                             <input
                                 tuiInputFiles
                                 type="file"
@@ -60,7 +60,6 @@
                             />
                         </label>
                     }
-
                     <tui-files class="files">
                         @if (
                             avatarControl.value
@@ -73,14 +72,6 @@
                         ) {
                             <tui-file
                                 state="error"
-                                [file]="file"
-                                (remove)="removeAvatarFile()"
-                            />
-                        }
-
-                        @if (loadingAvatarFiles$ | async; as file) {
-                            <tui-file
-                                size="l"
                                 [file]="file"
                                 (remove)="removeAvatarFile()"
                             />
