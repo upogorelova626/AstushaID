@@ -1,194 +1,194 @@
 name: CI
 
 permissions:
-  contents: read
-  packages: write
+    contents: read
+    packages: write
 
 on:
-  push:
-    branches:
-      - main
-      - develop
-  pull_request:
-    branches:
-      - main
+    push:
+        branches:
+            - main
+            - develop
+    pull_request:
+        branches:
+            - main
 
 jobs:
-  frontend:
-    name: Frontend checks
-    runs-on: ubuntu-latest
+    frontend:
+        name: Frontend checks
+        runs-on: ubuntu-latest
 
-    defaults:
-      run:
-        working-directory: astusha-id-frontend
+        defaults:
+            run:
+                working-directory: astusha-id-frontend
 
-    steps:
-      - name: Checkout repository
-        uses: actions/checkout@v4
+        steps:
+            - name: Checkout repository
+              uses: actions/checkout@v4
 
-      - name: Setup Node.js
-        uses: actions/setup-node@v4
-        with:
-          node-version: 22
-          cache: npm
-          cache-dependency-path: astusha-id-frontend/package-lock.json
+            - name: Setup Node.js
+              uses: actions/setup-node@v4
+              with:
+                  node-version: 22
+                  cache: npm
+                  cache-dependency-path: astusha-id-frontend/package-lock.json
 
-      - name: Install dependencies
-        run: npm ci
+            - name: Install dependencies
+              run: npm ci
 
-      - name: Run lint
-        run: npm run lint
+            - name: Run lint
+              run: npm run lint
 
-      - name: Build frontend
-        run: npm run build
+            - name: Build frontend
+              run: npm run build
 
-  backend:
-    name: Backend checks
-    runs-on: ubuntu-latest
+    backend:
+        name: Backend checks
+        runs-on: ubuntu-latest
 
-    defaults:
-      run:
-        working-directory: astusha-id-backend
+        defaults:
+            run:
+                working-directory: astusha-id-backend
 
-    steps:
-      - name: Checkout repository
-        uses: actions/checkout@v4
+        steps:
+            - name: Checkout repository
+              uses: actions/checkout@v4
 
-      - name: Setup Node.js
-        uses: actions/setup-node@v4
-        with:
-          node-version: 22
-          cache: npm
-          cache-dependency-path: astusha-id-backend/package-lock.json
+            - name: Setup Node.js
+              uses: actions/setup-node@v4
+              with:
+                  node-version: 22
+                  cache: npm
+                  cache-dependency-path: astusha-id-backend/package-lock.json
 
-      - name: Install dependencies
-        run: npm ci
+            - name: Install dependencies
+              run: npm ci
 
-      - name: Generate Prisma Client
-        run: npx prisma generate
+            - name: Generate Prisma Client
+              run: npx prisma generate
 
-      - name: Run lint
-        run: npm run lint
+            - name: Run lint
+              run: npm run lint
 
-      - name: Build backend
-        run: npm run build
+            - name: Build backend
+              run: npm run build
 
-  e2e:
-    name: Playwright E2E
-    runs-on: ubuntu-latest
+    e2e:
+        name: Playwright E2E
+        runs-on: ubuntu-latest
 
-    defaults:
-      run:
-        working-directory: astusha-id-frontend
+        defaults:
+            run:
+                working-directory: astusha-id-frontend
 
-    steps:
-      - name: Checkout repository
-        uses: actions/checkout@v4
+        steps:
+            - name: Checkout repository
+              uses: actions/checkout@v4
 
-      - name: Setup Node.js
-        uses: actions/setup-node@v4
-        with:
-          node-version: 22
-          cache: npm
-          cache-dependency-path: astusha-id-frontend/package-lock.json
+            - name: Setup Node.js
+              uses: actions/setup-node@v4
+              with:
+                  node-version: 22
+                  cache: npm
+                  cache-dependency-path: astusha-id-frontend/package-lock.json
 
-      - name: Install dependencies
-        run: npm ci
+            - name: Install dependencies
+              run: npm ci
 
-      - name: Install Playwright browser
-        run: npx playwright install --with-deps chromium
+            - name: Install Playwright browser
+              run: npx playwright install --with-deps chromium
 
-      - name: Run Playwright tests
-        run: npx playwright test --project=chromium
+            - name: Run Playwright tests
+              run: npx playwright test --project=chromium
 
-      - name: Upload Playwright report
-        if: always()
-        uses: actions/upload-artifact@v4
-        with:
-          name: playwright-report
-          path: astusha-id-frontend/playwright-report/
-          retention-days: 7
+            - name: Upload Playwright report
+              if: always()
+              uses: actions/upload-artifact@v4
+              with:
+                  name: playwright-report
+                  path: astusha-id-frontend/playwright-report/
+                  retention-days: 7
 
-  frontend-docker:
-    name: Frontend Docker build
-    runs-on: ubuntu-latest
-    needs:
-      - frontend
+    frontend-docker:
+        name: Frontend Docker build
+        runs-on: ubuntu-latest
+        needs:
+            - frontend
 
-    steps:
-      - name: Checkout repository
-        uses: actions/checkout@v4
+        steps:
+            - name: Checkout repository
+              uses: actions/checkout@v4
 
-      - name: Build frontend image
-        run: docker build -t astusha-id-frontend:test ./astusha-id-frontend
+            - name: Build frontend image
+              run: docker build -t astusha-id-frontend:test ./astusha-id-frontend
 
-  backend-docker:
-    name: Backend Docker build
-    runs-on: ubuntu-latest
-    needs:
-      - backend
+    backend-docker:
+        name: Backend Docker build
+        runs-on: ubuntu-latest
+        needs:
+            - backend
 
-    steps:
-      - name: Checkout repository
-        uses: actions/checkout@v4
+        steps:
+            - name: Checkout repository
+              uses: actions/checkout@v4
 
-      - name: Build backend image
-        run: docker build -t astusha-id-backend:test ./astusha-id-backend
+            - name: Build backend image
+              run: docker build -t astusha-id-backend:test ./astusha-id-backend
 
-      publish-frontend:
-    name: Publish frontend image
-    runs-on: ubuntu-latest
-    needs:
-      - frontend-docker
-      - backend-docker
-      - e2e
-    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    publish-frontend:
+        name: Publish frontend image
+        runs-on: ubuntu-latest
+        needs:
+            - frontend-docker
+            - backend-docker
+            - e2e
+        if: github.event_name == 'push' && github.ref == 'refs/heads/main'
 
-    steps:
-      - name: Checkout repository
-        uses: actions/checkout@v4
+        steps:
+            - name: Checkout repository
+              uses: actions/checkout@v4
 
-      - name: Login to GitHub Container Registry
-        uses: docker/login-action@v3
-        with:
-          registry: ghcr.io
-          username: ${{ github.actor }}
-          password: ${{ secrets.GITHUB_TOKEN }}
+            - name: Login to GitHub Container Registry
+              uses: docker/login-action@v3
+              with:
+                  registry: ghcr.io
+                  username: ${{ github.actor }}
+                  password: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: Build and push frontend image
-        uses: docker/build-push-action@v6
-        with:
-          context: ./astusha-id-frontend
-          push: true
-          tags: |
-            ghcr.io/${{ github.repository_owner }}/astusha-id-frontend:latest
-            ghcr.io/${{ github.repository_owner }}/astusha-id-frontend:${{ github.sha }}
+            - name: Build and push frontend image
+              uses: docker/build-push-action@v6
+              with:
+                  context: ./astusha-id-frontend
+                  push: true
+                  tags: |
+                      ghcr.io/${{ github.repository_owner }}/astusha-id-frontend:latest
+                      ghcr.io/${{ github.repository_owner }}/astusha-id-frontend:${{ github.sha }}
 
-  publish-backend:
-    name: Publish backend image
-    runs-on: ubuntu-latest
-    needs:
-      - frontend-docker
-      - backend-docker
-      - e2e
-    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    publish-backend:
+        name: Publish backend image
+        runs-on: ubuntu-latest
+        needs:
+            - frontend-docker
+            - backend-docker
+            - e2e
+        if: github.event_name == 'push' && github.ref == 'refs/heads/main'
 
-    steps:
-      - name: Checkout repository
-        uses: actions/checkout@v4
+        steps:
+            - name: Checkout repository
+              uses: actions/checkout@v4
 
-      - name: Login to GitHub Container Registry
-        uses: docker/login-action@v3
-        with:
-          registry: ghcr.io
-          username: ${{ github.actor }}
-          password: ${{ secrets.GITHUB_TOKEN }}
+            - name: Login to GitHub Container Registry
+              uses: docker/login-action@v3
+              with:
+                  registry: ghcr.io
+                  username: ${{ github.actor }}
+                  password: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: Build and push backend image
-        uses: docker/build-push-action@v6
-        with:
-          context: ./astusha-id-backend
-          push: true
-          tags: |
-            ghcr.io/${{ github.repository_owner }}/astusha-id-backend:latest
-            ghcr.io/${{ github.repository_owner }}/astusha-id-backend:${{ github.sha }}
+            - name: Build and push backend image
+              uses: docker/build-push-action@v6
+              with:
+                  context: ./astusha-id-backend
+                  push: true
+                  tags: |
+                      ghcr.io/${{ github.repository_owner }}/astusha-id-backend:latest
+                      ghcr.io/${{ github.repository_owner }}/astusha-id-backend:${{ github.sha }}
