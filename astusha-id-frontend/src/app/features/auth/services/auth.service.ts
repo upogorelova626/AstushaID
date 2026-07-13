@@ -21,7 +21,7 @@ export class AuthService {
     private readonly http = inject(HttpClient);
     private readonly usersService = inject(UsersService);
 
-    private readonly baseApiUrl = 'http://localhost:3002/auth';
+    private readonly baseApiUrl = '/api/auth';
 
     createAccount(payload: CreateAccountPayload): Observable<AstushaUser> {
         return this.http

@@ -12,7 +12,7 @@ import {
 
 import {AuthService} from '../../features/auth/services/auth.service';
 
-const baseApiUrl = 'http://localhost:3002';
+const baseApiUrl = '/api';
 
 let refreshRequest$: Observable<unknown> | null = null;
 

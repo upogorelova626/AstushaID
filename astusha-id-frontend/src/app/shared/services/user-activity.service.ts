@@ -9,7 +9,7 @@ import {Observable} from 'rxjs';
 export class UserActivityService {
     private readonly http = inject(HttpClient);
 
-    private readonly baseApiUrl = 'http://localhost:3002/users/me/activity';
+    private readonly baseApiUrl = '/api/users/me/activity';
 
     getUserActivity(): Observable<UserActivity[]> {
         return this.http.get<UserActivity[]>(`${this.baseApiUrl}`);

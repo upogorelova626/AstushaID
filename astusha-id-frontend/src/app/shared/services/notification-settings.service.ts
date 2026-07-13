@@ -12,8 +12,7 @@ import {Observable} from 'rxjs';
 export class NotificationSettingsService {
     private readonly http = inject(HttpClient);
 
-    private readonly baseApiUrl =
-        'http://localhost:3002/users/me/notification-settings';
+    private readonly baseApiUrl = '/api/users/me/notification-settings';
 
     getMyNotificationSettings(): Observable<NotificationSettings> {
         return this.http.get<NotificationSettings>(`${this.baseApiUrl}`);

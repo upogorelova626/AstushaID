@@ -9,7 +9,7 @@ import {Observable} from 'rxjs';
 export class UserSessionsService {
     private readonly http = inject(HttpClient);
 
-    private readonly baseApiUrl = 'http://localhost:3002/users/me/sessions';
+    private readonly baseApiUrl = '/api/users/me/sessions';
 
     getMySessions(): Observable<UserSession[]> {
         return this.http.get<UserSession[]>(`${this.baseApiUrl}`);
