@@ -30,7 +30,8 @@ module.exports = defineConfig([
                     prefix: 'app',
                     style: 'kebab-case'
                 }
-            ]
+            ],
+            '@typescript-eslint/no-unused-vars': 'error'
         }
     },
     {

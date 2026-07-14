@@ -10,7 +10,10 @@ import {
     ForgotPasswordPayload,
     LoginPayload,
     ResetPasswordPayload,
-    VerifyEmailTwoFactorPayload
+    VerifyEmailTwoFactorPayload,
+    EmailVerifyPayload,
+    CreateAccountResponse,
+    EmailVerificationRequiredResponse
 } from '../../../shared/interfaces';
 import {UsersService} from './users.service';
 
@@ -23,22 +26,36 @@ export class AuthService {
 
     private readonly baseApiUrl = '/api/auth';
 
-    createAccount(payload: CreateAccountPayload): Observable<AstushaUser> {
+    createAccount(
+        payload: CreateAccountPayload
+    ): Observable<CreateAccountResponse> {
+        return this.http.post<CreateAccountResponse>(
+            `${this.baseApiUrl}/create-account`,
+            payload
+        );
+    }
+
+    verifyEmail(payload: EmailVerifyPayload): Observable<AstushaUser> {
         return this.http
-            .post<AstushaUser>(`${this.baseApiUrl}/create-account`, payload)
+            .post<AstushaUser>(
+                `${this.baseApiUrl}/email-verification/verify`,
+                payload
+            )
             .pipe(
                 tap(user => {
                     this.usersService.setCurrentUser(user);
                 })
             );
     }
-
     login(payload: LoginPayload): Observable<AuthResponse> {
         return this.http
             .post<AuthResponse>(`${this.baseApiUrl}/login`, payload)
             .pipe(
                 tap(response => {
-                    if (!this.isEmailTwoFactorRequired(response)) {
+                    if (
+                        !this.isEmailTwoFactorRequired(response) &&
+                        !this.isEmailVerificationRequired(response)
+                    ) {
                         this.usersService.setCurrentUser(response);
                     }
                 })
@@ -98,6 +115,15 @@ export class AuthService {
         return (
             'twoFactorRequired' in response &&
             response.twoFactorRequired === true
+        );
+    }
+
+    private isEmailVerificationRequired(
+        response: AuthResponse
+    ): response is EmailVerificationRequiredResponse {
+        return (
+            'emailVerificationRequired' in response &&
+            response.emailVerificationRequired === true
         );
     }
 }

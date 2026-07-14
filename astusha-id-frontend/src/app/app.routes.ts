@@ -49,6 +49,13 @@ export const routes: Routes = [
                     import('./features/auth/pages/two-factor-page/two-factor-page.component').then(
                         m => m.TwoFactorPageComponent
                     )
+            },
+            {
+                path: 'email-confirmation',
+                loadComponent: () =>
+                    import('./features/auth/pages/email-confirmation/email-confirmation.component').then(
+                        m => m.EmailConfirmationComponent
+                    )
             }
         ]
     },

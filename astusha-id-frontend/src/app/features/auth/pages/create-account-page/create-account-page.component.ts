@@ -100,10 +100,10 @@ export class CreateAccountPageComponent {
 
         if (this.createAccountForm.invalid) {
             this.createAccountForm.markAllAsTouched();
-            console.log(this.createAccountForm);
 
             return;
         }
+
         const formValue = this.createAccountForm.getRawValue();
 
         const createAccountPayload = {
@@ -115,8 +115,18 @@ export class CreateAccountPageComponent {
         this.authService
             .createAccount(createAccountPayload)
             .pipe(
-                tap(() => {
-                    void this.router.navigate(['/account/profile']);
+                tap(response => {
+                    sessionStorage.setItem(
+                        'emailVerificationChallengeId',
+                        response.challengeId
+                    );
+
+                    sessionStorage.setItem(
+                        'emailVerificationEmail',
+                        response.email
+                    );
+
+                    void this.router.navigate(['/auth/email-confirmation']);
                 }),
                 catchError(() => {
                     this.registerError.set(true);
