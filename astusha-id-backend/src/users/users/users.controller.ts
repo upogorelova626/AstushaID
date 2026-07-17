@@ -7,6 +7,7 @@ import {
   Delete,
   Get,
   Patch,
+  Query,
   Req,
   UploadedFile,
   UseGuards,
@@ -19,6 +20,7 @@ import { JwtAuthGuard } from 'src/auth/guards/jwt-auth.guard';
 
 import { ChangePasswordDto } from '../dto/change-password.dto';
 import { DeleteAccountDto } from '../dto/delete-account.dto';
+import { SearchUsersQueryDto } from '../dto/search-users-query.dto';
 import { UpdateCurrentUserDto } from '../dto/update-current-user.dto';
 import { UpdateEmailTwoFactorDto } from '../dto/update-email-two-factor.dto';
 import { UpdateUserThemeDto } from '../dto/update-theme.dto';
@@ -35,6 +37,14 @@ type AuthenticatedRequest = Request & {
 @UseGuards(JwtAuthGuard)
 export class UsersController {
   constructor(private readonly usersService: UsersService) {}
+
+  @Get('search')
+  searchUsers(
+    @Req() req: AuthenticatedRequest,
+    @Query() dto: SearchUsersQueryDto,
+  ) {
+    return this.usersService.searchUsers(req.user.id, dto.query);
+  }
 
   @Get('me')
   getMe(@Req() req: AuthenticatedRequest) {

@@ -316,4 +316,57 @@ export class UsersService {
       );
     }
   }
+
+  searchUsers(currentUserId: string, query: string) {
+    const value = query.trim();
+
+    return this.prisma.user.findMany({
+      where: {
+        id: {
+          not: currentUserId,
+        },
+        emailVerifiedAt: {
+          not: null,
+        },
+        OR: [
+          {
+            login: {
+              contains: value,
+              mode: 'insensitive',
+            },
+          },
+          {
+            email: {
+              contains: value,
+              mode: 'insensitive',
+            },
+          },
+          {
+            firstName: {
+              contains: value,
+              mode: 'insensitive',
+            },
+          },
+          {
+            lastName: {
+              contains: value,
+              mode: 'insensitive',
+            },
+          },
+        ],
+      },
+      select: {
+        id: true,
+        login: true,
+        email: true,
+        firstName: true,
+        lastName: true,
+        avatarUrl: true,
+      },
+      orderBy: {
+        login: 'asc',
+      },
+      take: 10,
+    });
+  }
 }

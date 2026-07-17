@@ -51,6 +51,8 @@ model User {
   emailTwoFactorChallenges EmailTwoFactorChallenge[]
   notificationSettings     UserNotificationSettings?
 
+  emailVerificationChallenges EmailVerificationChallenge[]
+
   @@map("users")
 }
 
@@ -62,11 +64,11 @@ model UserNotificationSettings {
   pushNotificationsEnabled     Boolean @default(false)
   telegramNotificationsEnabled Boolean @default(false)
 
-  loginNotificationsEnabled             Boolean @default(true)
-  passwordChangedNotificationsEnabled   Boolean @default(true)
-  sessionsFinishedNotificationsEnabled  Boolean @default(true)
-  twoFactorNotificationsEnabled         Boolean @default(true)
-  marketingEmailsEnabled                Boolean @default(false)
+  loginNotificationsEnabled            Boolean @default(true)
+  passwordChangedNotificationsEnabled  Boolean @default(true)
+  sessionsFinishedNotificationsEnabled Boolean @default(true)
+  twoFactorNotificationsEnabled        Boolean @default(true)
+  marketingEmailsEnabled               Boolean @default(false)
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -148,4 +150,16 @@ model UserActivity {
   @@index([createdAt])
   @@index([userId, createdAt])
   @@map("user_activities")
+}
+
+model EmailVerificationChallenge {
+  id        String    @id @default(uuid())
+  userId    String
+  codeHash  String
+  attempts  Int       @default(0)
+  expiresAt DateTime
+  usedAt    DateTime?
+  createdAt DateTime  @default(now())
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
 }

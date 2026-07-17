@@ -30,6 +30,7 @@ import { ConfirmPasswordResetDto } from '../dto/confirm-password-reset.dto';
 import { CreateAccountDto } from '../dto/create-account.dto';
 import { LoginDto } from '../dto/login.dto';
 import { RequestPasswordResetDto } from '../dto/request-password-reset.dto';
+import { VerifyEmailDto } from '../dto/verify-email.dto';
 import { VerifyEmailTwoFactorDto } from '../dto/verify-email-two-factor.dto';
 import { AuthService } from './auth.service';
 
@@ -45,17 +46,29 @@ export class AuthController {
   @Post('create-account')
   @ApiBody({ type: CreateAccountDto })
   @ApiCreatedResponse({
-    description: 'Аккаунт успешно создан',
+    description: 'Аккаунт создан, код подтверждения отправлен на email',
   })
   @ApiConflictResponse({
     description: 'Пользователь с таким email или логином уже существует',
   })
-  async createAccount(
-    @Body() dto: CreateAccountDto,
+  async createAccount(@Body() dto: CreateAccountDto) {
+    return this.authService.createAccount(dto);
+  }
+  @Post('email-verification/verify')
+  @HttpCode(HttpStatus.OK)
+  @ApiBody({ type: VerifyEmailDto })
+  @ApiOkResponse({
+    description: 'Почта подтверждена, пользователь успешно вошёл в аккаунт',
+  })
+  @ApiUnauthorizedResponse({
+    description: 'Код подтверждения недействителен или истёк',
+  })
+  async verifyEmail(
+    @Body() dto: VerifyEmailDto,
     @Req() request: Request,
     @Res({ passthrough: true }) response: Response,
   ) {
-    const authResponse = await this.authService.createAccount(dto, request);
+    const authResponse = await this.authService.verifyEmail(dto, request);
 
     this.setAuthCookies(response, authResponse.tokens);
 
@@ -66,7 +79,8 @@ export class AuthController {
   @HttpCode(HttpStatus.OK)
   @ApiBody({ type: LoginDto })
   @ApiOkResponse({
-    description: 'Пользователь успешно вошёл в аккаунт',
+    description:
+      'Вход выполнен либо требуется подтверждение email или двухфакторная аутентификация',
   })
   @ApiUnauthorizedResponse({
     description: 'Неверный логин или пароль',
@@ -78,7 +92,10 @@ export class AuthController {
   ) {
     const authResponse = await this.authService.login(dto, request);
 
-    if ('twoFactorRequired' in authResponse) {
+    if (
+      'emailVerificationRequired' in authResponse ||
+      'twoFactorRequired' in authResponse
+    ) {
       return authResponse;
     }
 
@@ -91,7 +108,7 @@ export class AuthController {
   @HttpCode(HttpStatus.OK)
   @ApiBody({ type: VerifyEmailTwoFactorDto })
   @ApiOkResponse({
-    description: 'Код подтверждения успешно проверен',
+    description: 'Код двухфакторной аутентификации успешно проверен',
   })
   @ApiUnauthorizedResponse({
     description: 'Код подтверждения недействителен',
