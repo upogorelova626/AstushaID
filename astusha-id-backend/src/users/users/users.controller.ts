@@ -7,7 +7,7 @@ import {
   Delete,
   Get,
   Patch,
-  Query,
+  Post,
   Req,
   UploadedFile,
   UseGuards,
@@ -15,16 +15,15 @@ import {
 } from '@nestjs/common';
 import { FileInterceptor } from '@nestjs/platform-express';
 import type { Request } from 'express';
-
 import { JwtAuthGuard } from 'src/auth/guards/jwt-auth.guard';
-
 import { ChangePasswordDto } from '../dto/change-password.dto';
 import { DeleteAccountDto } from '../dto/delete-account.dto';
-import { SearchUsersQueryDto } from '../dto/search-users-query.dto';
+import { SearchUsersDto } from '../dto/search-users.dto';
 import { UpdateCurrentUserDto } from '../dto/update-current-user.dto';
 import { UpdateEmailTwoFactorDto } from '../dto/update-email-two-factor.dto';
 import { UpdateUserThemeDto } from '../dto/update-theme.dto';
 import { UsersService } from './users.service';
+import { GetUsersByIdsDto } from '../dto/get-users-by-ids.dto';
 
 type AuthenticatedRequest = Request & {
   user: {
@@ -38,12 +37,14 @@ type AuthenticatedRequest = Request & {
 export class UsersController {
   constructor(private readonly usersService: UsersService) {}
 
-  @Get('search')
-  searchUsers(
-    @Req() req: AuthenticatedRequest,
-    @Query() dto: SearchUsersQueryDto,
-  ) {
+  @Post('search')
+  searchUsers(@Req() req: AuthenticatedRequest, @Body() dto: SearchUsersDto) {
     return this.usersService.searchUsers(req.user.id, dto.query);
+  }
+
+  @Post('by-ids')
+  getByIds(@Body() dto: GetUsersByIdsDto) {
+    return this.usersService.findPublicByIds(dto.ids);
   }
 
   @Get('me')

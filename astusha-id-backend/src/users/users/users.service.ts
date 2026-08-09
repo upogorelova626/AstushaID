@@ -79,6 +79,27 @@ export class UsersService {
     return user;
   }
 
+  findPublicByIds(ids: string[]) {
+    return this.prisma.user.findMany({
+      where: {
+        id: {
+          in: ids,
+        },
+        emailVerifiedAt: {
+          not: null,
+        },
+      },
+      select: {
+        id: true,
+        login: true,
+        email: true,
+        firstName: true,
+        lastName: true,
+        avatarUrl: true,
+      },
+    });
+  }
+
   createUser(data: { login: string; email: string; passwordHash: string }) {
     return this.prisma.user.create({
       data,
