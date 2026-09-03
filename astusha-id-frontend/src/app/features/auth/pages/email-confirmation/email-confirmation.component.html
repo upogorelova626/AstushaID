@@ -2,50 +2,43 @@
     <header class="header">
         <div class="icon" tuiAvatar="@tui.mail" appearance="info"></div>
 
-        <h1 class="header-title">Подтверждение входа</h1>
+        <h1 class="header-title">Подтверждение почты</h1>
 
         <p class="header-subtitle">
-            Мы отправили код подтверждения
-            @if (email()) {
-                на {{ email() }}.
-            } @else {
-                на вашу почту.
-            }
-            Введите его ниже, чтобы завершить вход в аккаунт.
+            Мы отправили код подтверждения на вашу почту. Введите его ниже,
+            чтобы завершить создание аккаунта.
         </p>
     </header>
 
     <main class="content">
-        <form class="form" (submit)="$event.preventDefault()">
-            <label for="two-factor-code">Код из письма</label>
+        <form class="form" [formGroup]="form" (ngSubmit)="confirmEmail()">
+            <label for="confirm-email-code">Код из письма</label>
 
             <tui-textfield class="pin">
                 <input
-                    id="two-factor-code"
+                    id="confirm-email-code"
                     tuiInputPin
+                    formControlName="code"
                     inputmode="numeric"
-                    maxlength="6"
                     autocomplete="one-time-code"
+                    maxlength="6"
                     placeholder="••••••"
-                    [formControl]="code"
-                    (keydown.enter)="verifyCode()"
                 />
             </tui-textfield>
 
-            @if (code.touched && code.invalid) {
+            @if (form.controls.code.invalid && form.controls.code.touched) {
                 <p class="error">Введите 6 цифр из письма</p>
-            } @else {
-                <p class="hint">Код действует 10 минут</p>
             }
+
+            <p class="hint">Код действует 10 минут</p>
 
             <button
                 tuiButton
                 class="submit"
-                type="button"
+                type="submit"
                 size="l"
-                [disabled]="isLoading()"
+                [disabled]="form.invalid || isLoading()"
                 [loading]="isLoading()"
-                (click)="verifyCode()"
             >
                 Подтвердить
             </button>
@@ -56,7 +49,7 @@
                 <p class="resend-title">Не получили письмо?</p>
 
                 <p class="resend-text">
-                    Проверьте папку «Спам» или вернитесь ко входу, чтобы
+                    Проверьте папку «Спам» или вернитесь к регистрации, чтобы
                     запросить новый код.
                 </p>
             </div>
@@ -69,12 +62,12 @@
         <footer class="footer">
             <a
                 tuiLink
-                class="login-link"
+                class="register-link"
                 role="button"
                 tabindex="0"
-                (click)="backToLogin()"
+                (click)="backToRegistration()"
             >
-                Вернуться ко входу
+                Вернуться к регистрации
             </a>
         </footer>
     </main>

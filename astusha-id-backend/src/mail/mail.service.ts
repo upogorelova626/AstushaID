@@ -18,9 +18,30 @@ export class MailService {
     },
   });
 
+  sendEmailVerificationCode(email: string, code: string) {
+    return this.transporter.sendMail({
+      from: process.env.SMTP_FROM ?? process.env.SMTP_USER,
+      to: email,
+      subject: 'Подтверждение почты Astusha ID',
+      html: `
+        <h2>Подтверждение электронной почты</h2>
+
+        <p>Спасибо за регистрацию в Astusha ID.</p>
+
+        <p>Введите этот код, чтобы подтвердить адрес электронной почты:</p>
+
+        <h1 style="letter-spacing: 6px;">${code}</h1>
+
+        <p>Код действует 10 минут.</p>
+
+        <p>Если вы не создавали аккаунт, просто проигнорируйте это письмо.</p>
+      `,
+    });
+  }
+
   sendPasswordResetEmail(email: string, resetUrl: string) {
     return this.transporter.sendMail({
-      from: process.env.SMTP_FROM,
+      from: process.env.SMTP_FROM ?? process.env.SMTP_USER,
       to: email,
       subject: 'Сброс пароля Astusha ID',
       html: `
@@ -43,16 +64,20 @@ export class MailService {
     });
   }
 
-  async sendTwoFactorCode(email: string, code: string) {
-    await this.transporter.sendMail({
+  sendTwoFactorCode(email: string, code: string) {
+    return this.transporter.sendMail({
       from: process.env.SMTP_FROM ?? process.env.SMTP_USER,
       to: email,
-      subject: 'Код подтверждения Astusha ID',
+      subject: 'Код двухфакторной аутентификации Astusha ID',
       html: `
-        <h2>Код подтверждения</h2>
+        <h2>Подтверждение входа</h2>
+
         <p>Введите этот код для входа в Astusha ID:</p>
+
         <h1 style="letter-spacing: 6px;">${code}</h1>
+
         <p>Код действует 10 минут.</p>
+
         <p>Если это были не вы, просто проигнорируйте письмо.</p>
       `,
     });

@@ -25,7 +25,8 @@ test.describe('Create account', () => {
         await createAccountPage.fillValidForm();
         await createAccountPage.submit();
 
-        await expect(page).toHaveURL('/account/profile');
+        await expect(page).toHaveURL('/auth/email-confirmation');
+        await expect(page.getByText('Подтверждение почты')).toBeVisible();
     });
 
     test('should show alert when create account failed', async ({page}) => {

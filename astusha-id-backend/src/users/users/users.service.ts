@@ -79,6 +79,27 @@ export class UsersService {
     return user;
   }
 
+  findPublicByIds(ids: string[]) {
+    return this.prisma.user.findMany({
+      where: {
+        id: {
+          in: ids,
+        },
+        emailVerifiedAt: {
+          not: null,
+        },
+      },
+      select: {
+        id: true,
+        login: true,
+        email: true,
+        firstName: true,
+        lastName: true,
+        avatarUrl: true,
+      },
+    });
+  }
+
   createUser(data: { login: string; email: string; passwordHash: string }) {
     return this.prisma.user.create({
       data,
@@ -315,5 +336,58 @@ export class UsersService {
         'Можно загрузить только JPEG, PNG или WEBP',
       );
     }
+  }
+
+  searchUsers(currentUserId: string, query: string) {
+    const value = query.trim();
+
+    return this.prisma.user.findMany({
+      where: {
+        id: {
+          not: currentUserId,
+        },
+        emailVerifiedAt: {
+          not: null,
+        },
+        OR: [
+          {
+            login: {
+              contains: value,
+              mode: 'insensitive',
+            },
+          },
+          {
+            email: {
+              contains: value,
+              mode: 'insensitive',
+            },
+          },
+          {
+            firstName: {
+              contains: value,
+              mode: 'insensitive',
+            },
+          },
+          {
+            lastName: {
+              contains: value,
+              mode: 'insensitive',
+            },
+          },
+        ],
+      },
+      select: {
+        id: true,
+        login: true,
+        email: true,
+        firstName: true,
+        lastName: true,
+        avatarUrl: true,
+      },
+      orderBy: {
+        login: 'asc',
+      },
+      take: 10,
+    });
   }
 }

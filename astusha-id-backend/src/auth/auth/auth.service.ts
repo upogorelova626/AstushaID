@@ -18,6 +18,7 @@ import { UsersService } from '../../users/users/users.service';
 import { ConfirmPasswordResetDto } from '../dto/confirm-password-reset.dto';
 import { CreateAccountDto } from '../dto/create-account.dto';
 import { LoginDto } from '../dto/login.dto';
+import { VerifyEmailDto } from '../dto/verify-email.dto';
 import { RequestPasswordResetDto } from '../dto/request-password-reset.dto';
 import { VerifyEmailTwoFactorDto } from '../dto/verify-email-two-factor.dto';
 import type { AccessTokenPayload } from '../types/token-payload.type';
@@ -38,7 +39,7 @@ export class AuthService {
     private readonly mailService: MailService,
   ) {}
 
-  async createAccount(dto: CreateAccountDto, request: Request) {
+  async createAccount(dto: CreateAccountDto) {
     const email = dto.email.toLowerCase().trim();
     const login = dto.login.toLowerCase().trim();
 
@@ -64,14 +65,49 @@ export class AuthService {
       passwordHash,
     });
 
-    return this.finishLogin(
-      {
-        id: user.id,
-        email: user.email,
-        login: user.login,
+    return this.createEmailVerificationChallenge({
+      id: user.id,
+      email: user.email,
+    });
+  }
+
+  private async createEmailVerificationChallenge(user: {
+    id: string;
+    email: string;
+  }) {
+    await this.prisma.emailVerificationChallenge.updateMany({
+      where: {
+        userId: user.id,
+        usedAt: null,
       },
-      request,
-    );
+      data: {
+        usedAt: new Date(),
+      },
+    });
+
+    const code = this.generateTwoFactorCode();
+    const codeHash = await bcrypt.hash(code, 10);
+
+    const expiresAt = new Date();
+
+    expiresAt.setMinutes(expiresAt.getMinutes() + 10);
+
+    const challenge = await this.prisma.emailVerificationChallenge.create({
+      data: {
+        userId: user.id,
+        codeHash,
+        expiresAt,
+      },
+    });
+
+    await this.mailService.sendEmailVerificationCode(user.email, code);
+
+    return {
+      emailVerificationRequired: true,
+      challengeId: challenge.id,
+      email: this.maskEmail(user.email),
+      expiresAt: challenge.expiresAt,
+    };
   }
 
   async login(dto: LoginDto, request: Request) {
@@ -90,6 +126,10 @@ export class AuthService {
       throw new UnauthorizedException('Неверный логин или пароль');
     }
 
+    if (!user.emailVerifiedAt) {
+      return this.createEmailVerificationChallenge(user);
+    }
+
     if (user.emailTwoFactorEnabled) {
       return this.createEmailTwoFactorChallenge(user, request);
     }
@@ -99,6 +139,74 @@ export class AuthService {
         id: user.id,
         email: user.email,
         login: user.login,
+      },
+      request,
+    );
+  }
+
+  async verifyEmail(dto: VerifyEmailDto, request: Request) {
+    const challenge = await this.prisma.emailVerificationChallenge.findUnique({
+      where: {
+        id: dto.challengeId,
+      },
+      include: {
+        user: true,
+      },
+    });
+
+    if (!challenge || challenge.usedAt) {
+      throw new UnauthorizedException('Код подтверждения недействителен');
+    }
+
+    if (challenge.expiresAt < new Date()) {
+      throw new UnauthorizedException('Код подтверждения истёк');
+    }
+
+    if (challenge.attempts >= 5) {
+      throw new UnauthorizedException('Превышено количество попыток');
+    }
+
+    const isCodeValid = await bcrypt.compare(dto.code, challenge.codeHash);
+
+    if (!isCodeValid) {
+      await this.prisma.emailVerificationChallenge.update({
+        where: {
+          id: challenge.id,
+        },
+        data: {
+          attempts: {
+            increment: 1,
+          },
+        },
+      });
+
+      throw new UnauthorizedException('Неверный код подтверждения');
+    }
+
+    await this.prisma.$transaction([
+      this.prisma.user.update({
+        where: {
+          id: challenge.userId,
+        },
+        data: {
+          emailVerifiedAt: new Date(),
+        },
+      }),
+      this.prisma.emailVerificationChallenge.update({
+        where: {
+          id: challenge.id,
+        },
+        data: {
+          usedAt: new Date(),
+        },
+      }),
+    ]);
+
+    return this.finishLogin(
+      {
+        id: challenge.user.id,
+        email: challenge.user.email,
+        login: challenge.user.login,
       },
       request,
     );

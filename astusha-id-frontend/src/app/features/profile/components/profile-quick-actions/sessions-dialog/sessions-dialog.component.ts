@@ -10,13 +10,13 @@ import {UserSessionsService} from '../../../../../shared/services/user-sessions.
 import {UserSession} from '../../../../../shared/interfaces';
 import {catchError, EMPTY, finalize} from 'rxjs';
 import {TuiButton, type TuiDialogContext} from '@taiga-ui/core';
-import {TuiAvatar, TuiSkeleton} from '@taiga-ui/kit';
+import {TuiAvatar, TuiBadge, TuiSkeleton} from '@taiga-ui/kit';
 import {DatePipe} from '@angular/common';
 import {injectContext} from '@taiga-ui/polymorpheus';
 
 @Component({
     selector: 'app-sessions-dialog',
-    imports: [TuiButton, TuiAvatar, TuiSkeleton, DatePipe],
+    imports: [TuiButton, TuiAvatar, TuiSkeleton, DatePipe, TuiBadge],
     templateUrl: './sessions-dialog.component.html',
     styleUrl: './sessions-dialog.component.less',
     changeDetection: ChangeDetectionStrategy.OnPush

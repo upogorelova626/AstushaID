@@ -19,6 +19,14 @@ import {DeleteProfileNotificationDialogComponent} from './delete-profile-notific
 import {TwoFactorDialogComponent} from './two-factor-dialog/two-factor-dialog.component';
 import {SessionsDialogComponent} from './sessions-dialog/sessions-dialog.component';
 
+interface QuickAction {
+    title: string;
+    description: string;
+    icon: string;
+    handler: () => void;
+    danger?: boolean;
+}
+
 @Component({
     selector: 'app-profile-quick-actions',
     imports: [TuiButton, TuiIcon],
@@ -32,6 +40,35 @@ export class ProfileQuickActionsComponent {
     private readonly authService = inject(AuthService);
     private readonly router = inject(Router);
     private readonly alerts = inject(TuiNotificationService);
+
+    protected readonly actions: readonly QuickAction[] = [
+        {
+            title: 'Изменить пароль',
+            description: 'Обновите пароль для защиты вашего аккаунта.',
+            icon: '@tui.key-round',
+            handler: () => this.openChangePasswordDialog()
+        },
+        {
+            title: 'Безопасность',
+            description:
+                'Управляйте двухфакторной аутентификацией, чтобы дополнительно защитить вход в аккаунт.',
+            icon: '@tui.shield-check',
+            handler: () => this.openTwoFactorAuthDialog()
+        },
+        {
+            title: 'Сессии',
+            description: 'Управляйте активными сессиями на устройствах.',
+            icon: '@tui.monitor',
+            handler: () => this.openSessionDialog()
+        },
+        {
+            title: 'Удалить аккаунт',
+            description: 'Удалите свой аккаунт и все данные.',
+            icon: '@tui.trash-2',
+            danger: true,
+            handler: () => this.openDeleteProfileNotificationDialog()
+        }
+    ];
 
     protected openDeleteProfileNotificationDialog() {
         this.dialogs
