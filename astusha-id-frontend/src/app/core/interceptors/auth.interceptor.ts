@@ -40,12 +40,17 @@ export const credentialsInterceptor: HttpInterceptorFn = (request, next) => {
             );
             const isLogoutRequest = request.url.includes('/auth/logout');
 
+            const isConfirmEmailRequest = request.url.includes(
+                '/auth/email-verification/verify'
+            );
+
             if (
                 !isUnauthorized ||
                 isLoginRequest ||
                 isRefreshRequest ||
                 isTwoFactorRequest ||
-                isLogoutRequest
+                isLogoutRequest ||
+                isConfirmEmailRequest
             ) {
                 return throwError(() => error);
             }

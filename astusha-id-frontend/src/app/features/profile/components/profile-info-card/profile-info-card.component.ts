@@ -8,11 +8,10 @@ import {AsyncPipe, DatePipe} from '@angular/common';
 import {TuiError, TuiIcon, TuiInput, TuiTextfield} from '@taiga-ui/core';
 import {TuiAvatar, TuiSkeleton} from '@taiga-ui/kit';
 import {tap} from 'rxjs';
-
 import {UsersService} from '../../../auth/services/users.service';
 
 @Component({
-    selector: 'app-edit-profile',
+    selector: 'app-profile-info-card',
     imports: [
         TuiTextfield,
         TuiInput,
@@ -23,11 +22,11 @@ import {UsersService} from '../../../auth/services/users.service';
         DatePipe,
         AsyncPipe
     ],
-    templateUrl: './edit-profile.component.html',
-    styleUrl: './edit-profile.component.less',
+    templateUrl: './profile-info-card.component.html',
+    styleUrl: './profile-info-card.component.less',
     changeDetection: ChangeDetectionStrategy.OnPush
 })
-export class EditProfileComponent {
+export class ProfileInfoCardComponent {
     private readonly usersService = inject(UsersService);
 
     protected readonly isLoading = signal(true);
